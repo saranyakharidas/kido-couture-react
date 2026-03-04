@@ -1,0 +1,83 @@
+{% extends 'admin/base1.html' %}
+
+{% block title%}
+Order
+{% endblock %}
+{% block link  %}
+<link href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css" rel="stylesheet">
+
+{% endblock  %}
+{% block content %}
+<br><br>
+<div class="card">
+    <div class="card-header">
+        <h5>All Orders</h5> 
+        <span>Kido Couture <code>0776</code> order history</span>
+        <div class="card-header-right">    <ul class="list-unstyled card-option">        <li><i class="icofont icofont-simple-left "></i></li>        <li><i class="icofont icofont-maximize full-card"></i></li>        <li><i class="icofont icofont-minus minimize-card"></i></li>        <li><i class="icofont icofont-refresh reload-card"></i></li>        <li><i class="icofont icofont-error close-card"></i></li>    </ul></div>
+    </div>
+    <div class="card-block table-border-style">
+        <button class="stext-106 m-r-32 m-tb-5" ><a href="{% url 'order_all' 'all' %}"   method="GET" style="color: black; text-decoration: None;"  name="payment_status" >All</a></button>
+            <button class="stext-106 m-r-32 m-tb-5" ><a href="{% url 'order_all' 'PAID' %}" method="GET" style="color: black; text-decoration: None;"  name="payment_status" >Paid</a></button>
+            <button class="stext-106 m-r-32 m-tb-5" ><a href="{% url 'order_all' 'PENDING' %}" method="GET" style="color: black; text-decoration: None;"  name="payment_status" >Pending</a></button>
+            <button class="stext-106 m-r-32 m-tb-5" ><a href="{% url 'order_all' 'CANCELLED' %}" method="GET" style="color: black; text-decoration: None;"  name="payment_status" >Cancelled</a></button>
+            <button class="stext-106 m-r-32 m-tb-5" ><a href="{% url 'order_all' 'REFUNDED' %}" method="GET" style="color: black; text-decoration: None;"  name="payment_status" >Refunded</a></button>      
+        <div class="table-responsive">
+            <table id="userListTable" class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Order Id</th>
+                        <th>Username</th>
+                        <th>Created At</th>
+                        <th>Status</th>
+                        <th>Delivary Date</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for orderss in order  %}
+                    <tr>
+                        <th scope="row">TKN0234{{orderss.id}}</th>
+                        <td>{{orderss.user.username}}</td>
+                        <td>{{orderss.order_date}}</td>
+                        <td>{{orderss.payment_status}}</td>
+                        <td>{{orderss.delivery_date}}</td>
+                        <td><a class="btn btn-dark" href="{%url 'order_views' orderss.id%}">ORDER VIEWS</a>
+                            <a class="btn btn-light" href="{% url 'cancel_order' orderss.id%}">ORDER CANCEL</a></td>
+                    </tr>
+                    {% endfor %}
+                  
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+</div>
+  
+
+
+
+
+   
+  {% endblock  %}
+  
+
+  {% block script %}
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+  <script>
+        $(document).ready(function () {
+            $('#userListTable').DataTable({
+              lengthMenu: [5, 10, 25, 50], // Set the page length options
+              pageLength: 10, // Set the default page length
+              ordering: true, // Enable sorting
+              searching: true, // Enable search functionality
+              paging: true, // Enable pagination
+              // Other DataTables options go here
+            });
+           
+           
+        });
+  </script>
+  
+  
+  {% endblock  %}

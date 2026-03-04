@@ -1,0 +1,74 @@
+{% extends 'admin/base1.html' %}
+
+{% block title%}
+users
+{% endblock %}
+{% block link  %}
+<link href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css" rel="stylesheet">
+
+{% endblock  %}
+
+{% block content%}
+{% load static %}
+<br><br>
+    <h3>Product Page</h3>
+    <table id="userListTable" class="table table-striped">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Image</th>
+          <th>Name</th>
+          <th>Category</th>
+          <th>Available</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for pro in products %}
+        <tr>
+          <td>{{ pro.id }}</td>
+          {% if pro.variant_set.exists %}
+          {% with pros=pro.variant_set.all|random %}
+          <td><img style="width:50px;height:50px;" class="product-image" src="{{ MEDIA_URL }}{{ pros.variant_image.url }}" alt=""></td>
+          {% endwith %}
+          {% else %}
+  <td>No variants available</td>
+{% endif %}
+          <td>{{ pro.name }}</td>
+          <td>{{ pro.category }}</td>
+          <td>{{ pro.is_available }}</td>
+         
+          <td> {% if pro.is_available %}
+            <a class="btn btn-dark" href="{% url 'delete_product' pro.id%}">SOFT DELETE</a>
+            {% else %}
+            <a class="btn btn-dark" href="{% url 'activate_product' pro.id%}">ACTIVATE</a>
+            {% endif %}
+            <a class="btn btn-light" href="{%url 'product_view' pro.id%}">VIEW VARIANT</a></td>
+
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    <div>
+    <a class="btn btn-dark" style="width:200px;" href="{% url 'addproduct'%}">ADD PRODUCTS</a>
+    </div>
+{% endblock %}
+
+{% block script %}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $('#userListTable').DataTable({
+            lengthMenu: [5, 10, 25, 50], // Set the page length options
+            pageLength: 10, // Set the default page length
+            ordering: true, // Enable sorting
+            searching: true, // Enable search functionality
+            paging: true, // Enable pagination
+            // Other DataTables options go here
+        });
+    });
+</script>
+
+
+{% endblock  %}

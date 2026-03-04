@@ -1,0 +1,130 @@
+{% extends 'products/base.html' %}
+
+
+{% block style %}
+
+{% endblock %}
+
+
+{% block content %}
+
+{% load static %}
+<br><br><br><br>
+<div class="bg0 m-t-23 p-b-140">
+  <div class="container">
+    <div id="root" data-category-id="{{ category_id }}"></div>
+  </div>
+</div>
+{% endblock %}
+
+{% block script %}
+<script>
+  $(document).ready(function () {
+    $('.zoom').elevateZoom({
+      zoomWindowWidth: 300,
+      zoomWindowHeight: 200
+    });
+  });
+
+  $('.js-addcart-detail').each(function () {
+    var nameProduct = $(this).parent().parent().parent().parent().find('.js-name-detail').html();
+    $(this).on('click', function () {
+      swal(nameProduct, "is added to cart !", "success");
+    });
+  });
+
+</script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.js"></script>
+
+<script>
+  $(document).ready(function () {
+    $('.btn-addwish-b2').on('click', function (e) {
+      e.preventDefault();
+      const wishlistButton = $(this);
+      const variantId = wishlistButton.data('variant-id');
+
+      if (wishlistButton.hasClass('js-addedwish-b2')) {
+        $.ajax({
+          type: 'POST',
+          headers: { "X-CSRFToken": "{{ csrf_token }}" },
+          url: '/removing_wishlist/',
+          data: {
+            variant_id: variantId
+          },
+          success: function () {
+            swal({
+              text: `Item removed from the wishlist!`,
+              icon: "warning",
+              button: false,
+              timer: 1500 // Auto close the alert after 1.5 seconds
+            });
+
+            wishlistButton.removeClass('js-addedwish-b2');
+            wishlistButton.find('.icon-heart1').show();
+            wishlistButton.find('.icon-heart2').hide();
+          },
+          error: function () {
+            console.log('Error while removing from the wishlist.');
+          }
+        });
+      } else {
+        $.ajax({
+          type: 'POST',
+          headers: { "X-CSRFToken": "{{ csrf_token }}" },
+          url: '/adding_wishlist/',
+          data: {
+            variant_id: variantId
+          },
+          success: function () {
+            swal({
+              text: `Item added to the wishlist!`,
+              icon: "success",
+              button: false,
+              timer: 1500 // Auto close the success message after 1.5 seconds
+            });
+
+            wishlistButton.addClass('js-addedwish-b2');
+            wishlistButton.find('.icon-heart1').hide();
+            wishlistButton.find('.icon-heart2').show();
+          },
+          error: function () {
+            console.log('Error while adding to the wishlist.');
+          }
+        });
+      }
+    });
+  });
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10.16.3/dist/sweetalert2.all.min.js"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    // Get all the wishlist buttons by the common class name
+    const wishlistButtons = document.querySelectorAll(".wishlist-button");
+
+    wishlistButtons.forEach((button) => {
+      button.addEventListener("click", function (event) {
+        event.preventDefault(); // Prevent the default behavior of the link (e.g., navigating to '#')
+
+        Swal.fire({
+          icon: "info",
+          title: "Login Required",
+          text: "You need to log in to add items to your wishlist.",
+          showCancelButton: true,
+          confirmButtonText: "Go to Login Page",
+          cancelButtonText: "Stay on this Page",
+        }).then((result) => {
+          if (result.isConfirmed) {
+            // Redirect to the login page (Replace 'login-page.html' with your actual login page URL)
+            window.location.href = "{% url 'signin' %}";
+          } else {
+            // User chose to stay on the current page, add your logic here if needed
+            console.log("User chose to stay on this page");
+          }
+        });
+      });
+    });
+  });
+</script>
+{% endblock %}

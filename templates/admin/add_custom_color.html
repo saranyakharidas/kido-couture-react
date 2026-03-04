@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Custom Color</title>
+</head>
+<body>
+    <h2>Add a Custom Color</h2>
+    <form method="post"> <!-- Add method="post" to your form -->
+        {% csrf_token %}
+        <label for="customColor">Custom Color:</label>
+        <input type="text" id="customColor" name="customColor">
+
+        <button type="submit">Add Color</button>
+    </form>
+
+    <h3>Existing Colors:</h3>
+    <ul>
+        {% for color in colors %}
+            <li>{{ color.color }}</li>
+        {% endfor %}
+    </ul>
+
+    <script>
+    //     function addCustomColor() {
+    //     // Get the custom color input value
+    //     const customColorInput = document.getElementById('customColor');
+    //     const customColor = customColorInput.value.trim();
+
+    //     if (customColor) {
+    //         // Create a new option element
+    //         const option = document.createElement('option');
+    //         option.value = customColor;
+    //         option.textContent = customColor;
+
+    //         // Append the new option to the color variants select element
+    //         const colorVariantsSelect = document.getElementById('colorVariants');
+    //         colorVariantsSelect.appendChild(option);
+
+    //         // Clear the custom color input
+    //         customColorInput.value = '';
+    //     }
+    // }
+    </script>
+</body>
+</html>

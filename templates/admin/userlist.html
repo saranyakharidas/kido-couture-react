@@ -1,0 +1,76 @@
+{% extends 'admin/base1.html' %}
+
+{% block title%}
+users
+{% endblock %}
+{% block link  %}
+
+
+{% endblock  %}
+
+
+{% block content%}
+{% load static %}
+<br><br>
+<div class="card">
+  <div class="card-header">
+      <h5>User List</h5>
+  </div>
+  <div class="card-block table-border-style">
+      <div class="table-responsive">
+        <table id="userListTable" class="table table-striped">
+              <thead>
+                  <tr>
+                    <th>No</th>
+                      <th>ID</th>
+                   
+                      <th>Username</th>
+                      <th>Email</th>
+                      <th>Active</th>
+                      <th>Actions</th>
+                  </tr>
+              </thead>
+              <tbody>
+                  {% for user in userlist %}
+                  <tr>
+                    <td>{{ forloop.counter}}</td>
+                      <td>TK02345{{ user.id }}</td>
+               
+                      <td>{{ user.username }}</td>
+                      <td>{{ user.email }}</td>
+                      <td>{{ user.is_active }}</td>
+                      <td>
+                          {% if user.is_active %}
+                          <a class="btn btn-danger" href="{% url 'block_user' user.id %}">Block</a>
+                          {% else %}
+                          <a class="btn btn-success" href="{% url 'unblock_user' user.id %}">Unblock</a>
+                          {% endif %}
+                      </td>
+                  </tr>
+                  {% endfor %}
+              </tbody>
+          </table>
+      </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block script %}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $('#userListTable').DataTable({
+            lengthMenu: [5, 10, 25, 50], // Set the page length options
+            pageLength: 10, // Set the default page length
+            ordering: true, // Enable sorting
+            searching: true, // Enable search functionality
+            paging: true, // Enable pagination
+            // Other DataTables options go here
+        });
+    });
+</script>
+
+
+{% endblock  %}
