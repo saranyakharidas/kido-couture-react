@@ -23,4 +23,7 @@ urlpatterns = [
     path('edit_profile_address/<int:address_id>',views.edit_profile_address,name='edit_profile_address'),
 
     path('password_reset',views.password_reset,name="password_reset"),
+    
+    path('api/profile/', views.profile_api, name='profile_api'),
+    path('api/add-address/', views.add_address_api, name='add_address_api'),
 ]

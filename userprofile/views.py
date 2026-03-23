@@ -13,6 +13,59 @@ from django.core.mail import send_mail,EmailMessage
 from ecom import settings
 from django.template.loader import render_to_string
 from django.core.exceptions import ObjectDoesNotExist
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from userorder.serializers import UserAddressSerializer
+
+@api_view(['GET'])
+@login_required(login_url='signin')
+def profile_api(request):
+    user = request.user
+    user_data = {
+        'first_name': user.first_name,
+        'last_name': user.last_name,
+        'email': user.email,
+        'username': user.username
+    }
+    
+    addresses = UserAddress.objects.filter(user=user, is_active=True)
+    address_data = UserAddressSerializer(addresses, many=True).data
+    
+    wallets, _ = wallet.objects.get_or_create(user=user)
+    
+    return Response({
+        'user': user_data,
+        'addresses': address_data,
+        'wallet_balance': wallets.Wallettotal
+    })
+
+@api_view(['POST'])
+@login_required(login_url='signin')
+def add_address_api(request):
+    try:
+        data = request.data
+        address = UserAddress.objects.create(
+            user=request.user,
+            first_name=data.get('first_name'),
+            last_name=data.get('last_name'),
+            phone_number=data.get('phone_number'),
+            address_line_1=data.get('address_line_1'),
+            address_line_2=data.get('address_line_2', ''),
+            email=data.get('email'),
+            city=data.get('city'),
+            state=data.get('state'),
+            postal_code=data.get('postal_code'),
+            country=data.get('country', 'India'),
+            is_active=True
+        )
+        return Response({
+            'success': True,
+            'address': UserAddressSerializer(address).data
+        })
+    except Exception as e:
+        return Response({'success': False, 'error': str(e)}, status=400)
+
+
 # Create your views here.
 
 @cache_control(no_cache=True,must_revalidate=True,no_store=True)

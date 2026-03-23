@@ -43,45 +43,7 @@ def is_valid_password(password):
     return True
 
 def home(request):
-   if request.user.is_authenticated:
-      products = Products.objects.all()
-      orders = OrderItem.objects.values('product').annotate(order_count=Count('product'))
-
-      # Create a dictionary to store product IDs and their order counts
-      product_order_count = {item['product']: item['order_count'] for item in orders}
-     
-      cat = Category.objects.all()
-      banners = Banner.objects.all()
-      context = {
-         'products': products,
-         'cat': cat,
-         'banners': banners
-      }
-      return render(request, 'verify/home1.html', context)
-   else:
-      products = Products.objects.all()
-      orders = OrderItem.objects.values('product').annotate(order_count=Count('product'))
-
-      # Create a dictionary to store product IDs and their order counts
-      product_order_count = {item['product']: item['order_count'] for item in orders}
-
-      # Sort products based on order count (most-sold first)
-      # trending_products = sorted(products, key=lambda p: product_order_count.get(p.id, 0), reverse=True)
-
-      # paginator = Paginator(trending_products, 4)  # Display 8 products per page
-      # page_number = request.GET.get('page')
-      # products = paginator.get_page(page_number)
-
-      cat = Category.objects.all()
-      banners = Banner.objects.all()
-      context = {
-         'products': products,
-         'cat': cat,
-         'banners': banners
-      }
-
-            
-      return render(request, 'verify/home1.html',context)
+    return redirect('shop', 0)
 
 def signin(request):
    if request.user.is_authenticated:
@@ -93,8 +55,12 @@ def signin(request):
 
       user = authenticate(username = username, password = pass1)
 
-      if user is not None :
-        
+      if user is not None:
+         # Bypass OTP for admin/superusers
+         if user.is_superuser:
+            login(request, user)
+            return redirect('home')
+
          otp_store = get_random_string(length=5, allowed_chars='0123456789')
          request.session['otp'] = otp_store
          request.session['user_pk'] = user.pk
@@ -314,4 +280,149 @@ def logout_user(request):
   
     # messages.success(request,"logged Out Successfully")
     return redirect('signin')
+
+from rest_framework.decorators import api_view, authentication_classes, permission_classes
+from rest_framework.response import Response
+from rest_framework.permissions import AllowAny
+from rest_framework.authentication import SessionAuthentication
+
+class CsrfExemptSessionAuthentication(SessionAuthentication):
+    def enforce_csrf(self, request):
+        return  # Bypass CSRF checks for this specific integration
+
+@api_view(['GET'])
+@authentication_classes([CsrfExemptSessionAuthentication])
+@permission_classes([AllowAny])
+def user_status(request):
+    if request.user.is_authenticated:
+        return Response({
+            'is_authenticated': True,
+            'username': request.user.username,
+            'email': request.user.email,
+            'is_superuser': request.user.is_superuser,
+        })
+    return Response({
+        'is_authenticated': False,
+        'is_superuser': False,
+    })
+
+@api_view(['POST'])
+@authentication_classes([CsrfExemptSessionAuthentication])
+@permission_classes([AllowAny])
+def api_login(request):
+    data = request.data
+    username = data.get('username')
+    password = data.get('password')
+    user = authenticate(username=username, password=password)
+    
+    if user is not None:
+        if user.is_superuser:
+            login(request, user)
+            return Response({'success': True, 'is_superuser': True})
+            
+        otp_store = get_random_string(length=5, allowed_chars='0123456789')
+        request.session['otp'] = otp_store
+        request.session['user_pk'] = user.pk
+        
+        esubject = "OTP Login"
+        emessage = render_to_string('verify/otp_mail.html', {
+            'name': user.username,
+            'otp': otp_store,
+        })
+        email = EmailMessage(
+            esubject, emessage, settings.EMAIL_HOST_USER, [user.email]
+        )
+        email.fail_silently = True
+        email.send()
+        
+        return Response({'success': True, 'requires_otp': True})
+    return Response({'error': 'Invalid username or password'}, status=400)
+
+@api_view(['POST'])
+@authentication_classes([CsrfExemptSessionAuthentication])
+@permission_classes([AllowAny])
+def api_verify_otp(request):
+    data = request.data
+    store_otp = data.get('otp')
+    send_otp = request.session.get('otp')
+    user_id = request.session.get('user_pk')
+    
+    if send_otp and store_otp == send_otp:
+        try:
+            user = User.objects.get(id=user_id)
+            login(request, user)
+            return Response({'success': True})
+        except User.DoesNotExist:
+            return Response({'error': 'User not found'}, status=400)
+    return Response({'error': 'Invalid OTP'}, status=400)
+
+@api_view(['POST'])
+@authentication_classes([CsrfExemptSessionAuthentication])
+@permission_classes([AllowAny])
+def api_signup(request):
+    data = request.data
+    username = data.get('username')
+    email = data.get('email')
+    password = data.get('password')
+    confirm_password = data.get('confirm_password')
+    
+    if password != confirm_password:
+        return Response({'error': 'Passwords do not match'}, status=400)
+        
+    if User.objects.filter(username=username).exists():
+        return Response({'error': 'Username already exists'}, status=400)
+        
+    if not is_valid_password(password):
+        return Response({'error': 'Password must be at least 8 characters long and contain one uppercase letter, one lowercase letter, and one digit.'}, status=400)
+        
+    myuser = User.objects.create_user(username=username, email=email, password=password)
+    myuser.is_active = False
+    myuser.save()
+    
+    current_site = get_current_site(request)
+    esubject = "Confirm your email @ Kido Couture"
+    emessage = render_to_string('verify/email_confirm.html', {
+        'name': myuser.username,
+        'domain': current_site.domain,
+        'uid': urlsafe_base64_encode(force_bytes(myuser.pk)),
+        'token': generate_token.make_token(myuser),
+    })
+    
+    email_msg = EmailMessage(esubject, emessage, settings.EMAIL_HOST_USER, [myuser.email])
+    email_msg.fail_silently = True
+    email_msg.send()
+    
+    return Response({'success': True, 'message': 'Registration successful. Please check your email to verify your account.'})
+
+
+def resend_activation(request):
+    if request.method == 'POST':
+        email = request.POST.get('email', '').strip()
+        try:
+            myuser = User.objects.get(email=email)
+            if myuser.is_active:
+                messages.error(request, "This account is already active. Please sign in.")
+                return render(request, 'verify/activation_failed.html')
+            # Resend the activation email
+            current_site = get_current_site(request)
+            esubject = "Resend: Confirm your email @ Kido Couture"
+            emessage = render_to_string('verify/email_confirm.html', {
+                'name': myuser.username,
+                'domain': current_site.domain,
+                'uid': urlsafe_base64_encode(force_bytes(myuser.pk)),
+                'token': generate_token.make_token(myuser),
+            })
+            email_msg = EmailMessage(
+                esubject,
+                emessage,
+                settings.EMAIL_HOST_USER,
+                [myuser.email],
+            )
+            email_msg.fail_silently = True
+            email_msg.send()
+            messages.success(request, "A new activation link has been sent to your email.")
+        except User.DoesNotExist:
+            messages.error(request, "No account found with this email address.")
+        return render(request, 'verify/activation_failed.html')
+    return render(request, 'verify/activation_failed.html')
 

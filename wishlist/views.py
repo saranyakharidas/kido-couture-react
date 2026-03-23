@@ -6,6 +6,10 @@ from django.views.decorators.cache import cache_control
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from .serializers import WishlistSerializer
+
 # Create your views here.
 @cache_control(no_cache=True,must_revalidate=True,no_store=True)
 @login_required(login_url='signin')
@@ -16,6 +20,13 @@ def wishlist(request):
         'product':product
     }
     return render(request,"wishlist/wishlist.html",context)
+
+@api_view(['GET'])
+@login_required(login_url='signin')
+def wishlist_api(request):
+    wishlist_items = Wishlist.objects.filter(user=request.user)
+    serializer = WishlistSerializer(wishlist_items, many=True)
+    return Response(serializer.data)
 
 def adding_wishlist(request):
     if request.method == 'POST':

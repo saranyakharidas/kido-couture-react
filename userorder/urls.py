@@ -6,7 +6,7 @@ from . import views
 urlpatterns = [
       path('checkout/<int:address_id>',views.checkout,name='checkout'),
       
-      path('online_payment_order/<userId>',views.online_payment_order,name='online_payment_order'),
+      path('api/online_payment_order/<userId>',views.online_payment_order,name='online_payment_order'),
 
       path('place_order/<userId>',views.place_order,name='place_order'),
 
@@ -20,11 +20,17 @@ urlpatterns = [
       
       path('return_order/<int:order_id>/', views.return_order, name='return_order'),
 
-      path('initiate_payment/', views.initiate_payment, name='initiate_payment'),
+      path('api/initiate_payment/', views.initiate_payment, name='initiate_payment'),
 
-      path('order_success/<int:orderId>/', views.order_success, name='order_success'),\
+      path('order_success/<int:orderId>/', views.order_success, name='order_success'),
       
       path('order_pdf/<int:order_id>/', views.order_pdf, name='order_pdf'),
+
+      path('api/checkout/', views.checkout_api, name='checkout_api'),
+      path('api/place-order/', views.place_order_api, name='place_order_api'),
+      path('api/orders/', views.ordertable_api, name='ordertable_api'),
+      path('api/orders/<int:order_id>/', views.order_view_api, name='order_view_api'),
+      path('api/orders/<int:order_id>/cancel/', views.cancel_order_api, name='cancel_order_api'),
 
       
      

@@ -12,6 +12,7 @@ urlpatterns = [
 
     path('shop/<int:category_id>',views.shop,name='shop'),
     path('api/shop/<int:category_id>',views.shop_api,name='shop_api'),
+    path('api/product_details/<slug:slug>', views.product_details_api, name='product_details_api'),
 
     path('filter/<int:category_id>',views.filter,name='filter'),
     path('api/categories/', views.categories_api, name='categories_api'),

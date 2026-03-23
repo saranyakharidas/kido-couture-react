@@ -11,28 +11,37 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 """
 
 import os
+from dotenv import load_dotenv
+
+# Load .env file
+load_dotenv()
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 EMAIL_USE_TLS = True
 EMAIL_HOST = 'smtp.gmail.com'       
-EMAIL_HOST_USER = 'djangoproject207@gmail.com'
-EMAIL_HOST_PASSWORD = 'xnaroijqvccxyhsp'
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
 EMAIL_PORT = 587
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '32w1%qy=b=u^-gi_66--w1l1b6cfu&f!wv47*%$kimgkm9h%ys'
+SECRET_KEY = os.getenv('SECRET_KEY', 'default-django-secret-key-if-not-set')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv('DEBUG', 'False').lower() == 'true'
 
 
 
-ALLOWED_HOSTS = ['51.20.81.196' , '0.0.0.0' ,'localhost','127.0.0.1']
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
+
+INTERNAL_IPS = [
+    '127.0.0.1',
+    'localhost',
+]
 
 # Application definition
 
@@ -59,8 +68,8 @@ INSTALLED_APPS = [
 
 # RAZO PAY SET -----------------------
 
-RAZOR_KEY_ID = 'rzp_test_uWMgVsRdHa6w2l'
-RAZOR_KEY_SECRET = 'z9ym12kYjODFkN0wxLE6NKAH'
+RAZOR_KEY_ID = os.getenv('RAZOR_KEY_ID')
+RAZOR_KEY_SECRET = os.getenv('RAZOR_KEY_SECRET')
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
@@ -73,24 +82,19 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-CSRF_TRUSTED_ORIGINS = [
-    "http://51.20.81.196",
-    ]
+CSRF_TRUSTED_ORIGINS = os.getenv('CSRF_TRUSTED_ORIGINS', '').split(',')
 
 ROOT_URLCONF = 'ecom.urls'
 
-CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+    "http://localhost:8000",
+    "http://127.0.0.1:8000",
+]
 
 CORS_ALLOW_CREDENTIALS = True
 
-DJANGO_VITE = {
-    "default": {
-        "dev_mode": False,
-        "dev_server_host": "localhost",
-        "dev_server_port": 5173,
-        "static_url_prefix": "/",
-    }
-}
 
 TEMPLATES = [
     {
@@ -165,6 +169,16 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR,'static')
 ]
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+DJANGO_VITE = {
+    "default": {
+        "dev_mode": DEBUG,
+        "dev_server_host": "127.0.0.1",
+        "dev_server_port": 5173,
+        "static_url_prefix": "",
+        "manifest_path": os.path.join(BASE_DIR, "static", "dist", ".vite", "manifest.json"),
+    }
+}
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 

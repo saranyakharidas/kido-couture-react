@@ -8,14 +8,21 @@ register = template.Library()
 @register.simple_tag(takes_context=True)
 def cart_items_count(context):
     user = context['request'].user
-    cart_items_count = CartItems.objects.filter(cart__user=user).count()
-    return cart_items_count
+    if user.is_authenticated:
+        # Import sum locally to avoid conflicts if needed, but it's already in the model usually
+        from cart.models import CartItems
+        from django.db.models import Sum
+        res = CartItems.objects.filter(cart__user=user).aggregate(total=Sum('quantity'))
+        return res['total'] if res['total'] else 0
+    return 0
 
 @register.simple_tag(takes_context=True)
 def wishlist_count(context):
-    user = user = context['request'].user
-    wishlist_count = Wishlist.objects.filter(user = user).count()
-    return wishlist_count
+    user = context['request'].user
+    if user.is_authenticated:
+        # Exclude items with no product (buggy leftover from account signals)
+        return Wishlist.objects.filter(user=user).exclude(product__id__isnull=True).count()
+    return 0
 
 @register.filter
 def in_wishlist(user, product_id):

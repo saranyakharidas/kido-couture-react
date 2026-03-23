@@ -154,65 +154,17 @@ def shop(request, category_id):
 
 @api_view(['GET'])
 def shop_api(request, category_id):
-    variants = Variant.objects.all()
-    cat_offer = Category_Offer.objects.all()
-    
-    # Calculate offers
-    for cat in cat_offer:
-        for product in variants: 
-            if product.product.category == cat.category and product.product_offer >=  0 and cat.discount >= 0 and cat.discount <= product.product_offer :
-                off =  product.product_offer 
-                if off <= 70 and off >= 0 :
-                    product.discount_price = product.price-(product.price*off/100)
-                    product.offer_perc = product.product_offer
-                    product.save()
-            elif  product.product.category == cat.category and product.product_offer >= 0  and cat.discount >= 0  and cat.discount >= product.product_offer :
-                if cat.discount <= 70 and cat.discount >= 0 :
-                    product.discount_price = product.price-(product.price*cat.discount/100)
-                    product.offer_perc = cat.discount
-                    product.save()
-            elif product.product.category != cat.category and product.product_offer > 0 :
-                if product.product_offer > 0 and product.product_offer < 70 :
-                    product.discount_price = product.price-(product.price*product.product_offer/100)
-                    product.save()
-
+    """
+    Simplified API for debugging.
+    """
     if category_id == 0:
         variants = Variant.objects.all()
     else:
-        category = get_object_or_404(Category, id=category_id)
-        variants = Variant.objects.filter(product__category=category)
-        
-    search_query = request.GET.get('search')
-    price_filter = request.GET.get('price')
-    sort_by = request.GET.get('sort')
-
-    if search_query:
-        variants = variants.filter(
-            Q(product__name__icontains=search_query) | Q(product__descriptions__icontains=search_query)
-        )
-
-    if price_filter:
-        if price_filter == '0-500':
-            variants = variants.filter(discount_price__range=(Decimal('0.00'), Decimal('500.00')))
-        elif price_filter == '500-1000':
-            variants = variants.filter(discount_price__range=(Decimal('500.00'), Decimal('1000.00')))
-        elif price_filter == '1000-2000':
-            variants = variants.filter(discount_price__range=(Decimal('1000.00'), Decimal('2000.00')))
-        elif price_filter == '2000-3000':
-            variants = variants.filter(discount_price__range=(Decimal('2000.00'), Decimal('3000.00')))
-        elif price_filter == '3000+':
-            variants = variants.filter(discount_price__gte=Decimal('3000.00'))
-
-    if sort_by == 'popularity':
-        variants = variants.order_by('-product__created_at')
-    elif sort_by == 'newness':
-        variants = variants.order_by('-product__created_at')
-    elif sort_by == 'price_low_to_high':
-        variants = variants.order_by('price')
-    elif sort_by == 'price_high_to_low':
-        variants = variants.order_by('-price')
-
-    # Serialize data
+        variants = Variant.objects.filter(product__category_id=category_id)
+    
+    # Simple sort by ID to be extremely safe
+    variants = variants.order_by('-id')
+    
     serializer = VariantSerializer(variants, many=True)
     return Response(serializer.data)
 
@@ -225,6 +177,25 @@ def categories_api(request):
     categories = Category.objects.all()
     serializer = CategorySerializer(categories, many=True)
     return Response(serializer.data)
+
+@api_view(['GET'])
+def product_details_api(request, slug):
+    try:
+        variant = Variant.objects.get(slug=slug)
+        # Related products (variants from same category excluding current product)
+        related_products = Variant.objects.filter(
+            product__category=variant.product.category
+        ).exclude(product=variant.product).distinct('product')[:4]
+        
+        variant_data = VariantSerializer(variant).data
+        related_data = VariantSerializer(related_products, many=True).data
+        
+        return Response({
+            'variant': variant_data,
+            'related': related_data
+        })
+    except Variant.DoesNotExist:
+        return Response({'error': 'Product not found'}, status=404)
 
 def filter(request, category_id):
     if category_id == 0:

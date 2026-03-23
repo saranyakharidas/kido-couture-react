@@ -4,6 +4,7 @@ from . import views
 
 urlpatterns = [
     path('add/<int:variant_id>/', views.add_to_cart, name='add_to_cart'),
+    path('api/add-to-cart/<int:variant_id>/', views.add_to_cart_api, name='add_to_cart_api'),
 
     path('cart', views.view_cart, name='cart'),
 
@@ -23,5 +24,12 @@ urlpatterns = [
     
     # path('update_guestcart_quantity', views.update_guestcart_quantity, name='update_guestcart_quantity'),
     
-   
+    
+    path('api/cart/', views.cart_view_api, name='cart_view_api'),
+    path('api/cart/update-quantity/', views.update_quantity_api, name='update_quantity_api'),
+    path('api/cart/remove/<int:item_id>/', views.remove_from_cart_api, name='remove_from_cart_api'),
+    path('api/cart/apply-coupon/', views.apply_coupon_api, name='apply_coupon_api'),
+    path('api/cart/remove-coupon/', views.remove_coupon_api, name='remove_coupon_api'),
+    
+    path('api/counts/', views.get_cart_counts, name='get_cart_counts'),
 ]

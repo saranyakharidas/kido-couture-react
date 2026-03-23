@@ -12,8 +12,119 @@ from django.shortcuts import get_object_or_404
 from django.views.decorators.cache import cache_control
 from django.contrib.auth.decorators import login_required
 from django.db.models import Sum
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from .serializers import CartSerializer, CouponSerializer
+
+@api_view(['GET'])
+@login_required(login_url='signin')
+def cart_view_api(request):
+    cart, created = Cart.objects.get_or_create(user=request.user)
+    available_coupons = Coupon.objects.filter(is_expired=False)
+    
+    serializer = CartSerializer(cart)
+    coupon_serializer = CouponSerializer(available_coupons, many=True)
+    
+    return Response({
+        'cart': serializer.data,
+        'available_coupons': coupon_serializer.data
+    })
+
+@api_view(['POST'])
+@login_required(login_url='signin')
+def update_quantity_api(request):
+    item_id = request.data.get('item_id')
+    quantity = int(request.data.get('quantity'))
+    
+    try:
+        item = CartItems.objects.get(id=item_id, cart__user=request.user)
+        if item.product.stock >= quantity:
+            item.quantity = quantity
+            item.save()
+            return Response({'success': True})
+        else:
+            return Response({'success': False, 'error': 'Not enough stock'}, status=400)
+    except CartItems.DoesNotExist:
+        return Response({'success': False, 'error': 'Item not found'}, status=404)
+
+@api_view(['POST'])
+@login_required(login_url='signin')
+def remove_from_cart_api(request, item_id):
+    try:
+        item = CartItems.objects.get(id=item_id, cart__user=request.user)
+        item.delete()
+        return Response({'success': True})
+    except CartItems.DoesNotExist:
+        return Response({'success': False, 'error': 'Item not found'}, status=404)
+
+@api_view(['POST'])
+@login_required(login_url='signin')
+def apply_coupon_api(request):
+    coupon_code = request.data.get('coupon_code')
+    cart = Cart.objects.get(user=request.user)
+    try:
+        coupon = Coupon.objects.get(coupon_code=coupon_code, is_expired=False)
+        subtotal = cart.get_total_price()
+        if subtotal >= coupon.mininum_amount:
+            cart.coupons = coupon
+            cart.save()
+            return Response({'success': True})
+        else:
+            return Response({'success': False, 'error': f'Minimum amount {coupon.mininum_amount} not met'}, status=400)
+    except Coupon.DoesNotExist:
+        return Response({'success': False, 'error': 'Invalid coupon code'}, status=404)
+
+@api_view(['POST'])
+@login_required(login_url='signin')
+def remove_coupon_api(request):
+    cart = Cart.objects.get(user=request.user)
+    cart.coupons = None
+    cart.save()
+    return Response({'success': True})
 
 
+
+from django.views.decorators.csrf import csrf_exempt
+
+@csrf_exempt
+@api_view(['POST'])
+def add_to_cart_api(request, variant_id):
+    if not request.user.is_authenticated:
+        return Response({'success': False, 'error': 'Please login to add items to your cart.'}, status=403)
+    try:
+        variant = Variant.objects.get(id=variant_id)
+        cart, created = Cart.objects.get_or_create(user=request.user)
+        item = cart.cartitems_set.filter(product=variant).first()
+        
+        quantity = int(request.data.get('quantity', 1))
+
+        if item:
+            if variant.stock >= item.quantity + quantity:
+                item.quantity += quantity
+                item.save()
+            else:
+                return Response({'error': 'Not enough stock available'}, status=400)
+        else:
+            if variant.stock >= quantity:
+                price_item = variant.discount_price if variant.discount_price else variant.price
+                CartItems.objects.create(
+                    cart=cart,
+                    product=variant, 
+                    quantity=quantity, 
+                    price=price_item
+                )
+            else:
+                return Response({'error': 'Not enough stock available'}, status=400)
+        
+        return Response({
+            'success': True, 
+            'message': 'Successfully added product to cart',
+            'cart_count': cart.cartitems_set.aggregate(total=Sum('quantity'))['total'] or 0
+        })
+    except Variant.DoesNotExist:
+        return Response({'error': 'Product variant not found'}, status=404)
+    except Exception as e:
+        return Response({'error': str(e)}, status=500)
 
 def add_to_cart(request, variant_id):
     variant = Variant.objects.get(id=variant_id)
@@ -301,3 +412,25 @@ def view_wallet(request):
 #     }
     
 #     return JsonResponse(response_data, status=400)
+@api_view(['GET'])
+def get_cart_counts(request):
+    cart_count = 0
+    wishlist_count = 0
+    if request.user.is_authenticated:
+        try:
+            cart, created = Cart.objects.get_or_create(user=request.user)
+            # Use Sum of quantities to show total items
+            res = CartItems.objects.filter(cart=cart).aggregate(total=Sum('quantity'))
+            cart_count = res['total'] if res['total'] else 0
+        except Exception as e:
+            print(f"Error in get_cart_counts: {e}")
+            cart_count = 0
+        
+        from wishlist.models import Wishlist
+        wishlist_count = Wishlist.objects.filter(user=request.user).exclude(product__id__isnull=True).count()
+        
+    # print(f"Counts for {request.user}: cart={cart_count}, wishlist={wishlist_count}")
+    return Response({
+        'cart_count': cart_count,
+        'wishlist_count': wishlist_count
+    })

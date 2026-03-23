@@ -20,8 +20,13 @@ path('update_password', views.update_password, name='update_password'),
 path('reset_password/<uidb64>/<token>',views.reset_password,name='reset_password'),
 
 path('logout_user/',views.logout_user,name='logout_user'),
-
+path('api/user-status/', views.user_status, name='user_status'),
+path('api/login/', views.api_login, name='api_login'),
+path('api/signup/', views.api_signup, name='api_signup'),
+path('api/verify-otp/', views.api_verify_otp, name='api_verify_otp'),
 path('sendmail/',views.sendmail,name='sendmail'),
+path('resend-activation/', views.resend_activation, name='resend_activation'),
+
 
 
 
