@@ -19,7 +19,8 @@ urlpatterns = [
     path('activate_product/<int:product_id>', views.activate_product, name='activate_product'),
     path('product_view/<int:product_id>', views.product_view, name='product_view'),
 
-    path('userlist/',views.userlist,name='userlist'),
+    path('admin_userlist/',views.userlist,name='userlist'),
+
     path('block/<int:user_id>/', views.block_user, name='block_user'),
     path('unblock/<int:user_id>/', views.unblock_user, name='unblock_user'),
     

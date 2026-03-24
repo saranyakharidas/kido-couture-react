@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Mail, Lock, User, ArrowRight, KeyRound, Loader2, CheckCircle2 } from 'lucide-react';
+import { Mail, Lock, User, ArrowRight, KeyRound, Loader2, CheckCircle2, Gift } from 'lucide-react';
 
 const AuthForms = ({ API_BASE_URL, onViewChange, onLoginSuccess, initialView = 'login' }) => {
     const [view, setView] = useState(initialView); // 'login', 'signup', 'otp', 'success'
@@ -17,8 +17,10 @@ const AuthForms = ({ API_BASE_URL, onViewChange, onLoginSuccess, initialView = '
         email: '',
         password: '',
         confirm_password: '',
-        otp: ''
+        otp: '',
+        referral_code: ''
     });
+
 
     const handleInputChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -87,8 +89,10 @@ const AuthForms = ({ API_BASE_URL, onViewChange, onLoginSuccess, initialView = '
                     username: formData.username,
                     email: formData.email,
                     password: formData.password,
-                    confirm_password: formData.confirm_password
+                    confirm_password: formData.confirm_password,
+                    referral_code: formData.referral_code
                 })
+
             });
             const data = await response.json();
             if (response.ok && data.success) {
@@ -248,6 +252,17 @@ const AuthForms = ({ API_BASE_URL, onViewChange, onLoginSuccess, initialView = '
                                         style={{ width: '100%', paddingLeft: '50px', paddingRight: '20px', height: '50px', borderRadius: '25px', background: '#fcfcfc', border: '1px solid #e6e6e6', outline: 'none' }}
                                     />
                                 </div>
+
+                                <div style={{ position: 'relative', marginBottom: '25px' }}>
+                                    <Gift size={18} style={{ position: 'absolute', top: '16px', left: '20px', color: '#999' }} />
+                                    <input
+                                        className="stext-102 cl2 trans-04"
+                                        type="text" name="referral_code" placeholder="Referral Code (Optional)"
+                                        value={formData.referral_code} onChange={handleInputChange}
+                                        style={{ width: '100%', paddingLeft: '50px', paddingRight: '20px', height: '50px', borderRadius: '25px', background: '#fcfcfc', border: '1px solid #e6e6e6', outline: 'none' }}
+                                    />
+                                </div>
+
 
                                 <button
                                     className="flex-c-m stext-101 cl0 trans-04 pointer"

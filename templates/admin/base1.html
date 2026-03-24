@@ -95,17 +95,16 @@
     
           <div class="collapse navbar-collapse justify-content-between" id="navbarCollapse">
             <div class="navbar-nav">
-              <a href="/userlist" class="nav-item nav-link">Customer</a>
-              <a href="{% url 'category' %}" class="nav-item nav-link">Category</a>
+              <a href="{% url 'userlist' %}" class="nav-item nav-link">Customers</a>
+              <a href="{% url 'category' %}" class="nav-item nav-link">Categories</a>
               <a href="{% url 'adminpage' %}" class="nav-item nav-link">Products</a>
-              <a href="{% url 'order_all' 'all' %}" class="nav-item nav-link">View Orders</a>
+              <a href="{% url 'order_all' 'all' %}" class="nav-item nav-link">Orders</a>
               <a href="{% url 'return_orders'%}" class="nav-item nav-link">Return Orders</a>
               <a href="{% url 'coupons'%}" class="nav-item nav-link">Coupons</a>
-              <a href="{% url 'banner_view'%}" class="nav-item nav-link">Banner</a>
+              <a href="{% url 'banner_view'%}" class="nav-item nav-link">Banners</a>
               <a href="{% url 'offer_management'%}" class="nav-item nav-link">Offers</a>
-
-              
-              <!-- <a href="/view-feedback" class="nav-item nav-link">Feedback</a> -->
+              <a href="{% url 'sales_report'%}" class="nav-item nav-link">Sales Report</a>
+              <a href="{% url 'add_custom_color'%}" class="nav-item nav-link">Colors</a>
             </div>
     
             <div class="navbar-nav navbar-right">

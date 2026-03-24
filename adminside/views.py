@@ -1,5 +1,7 @@
 from django.shortcuts import render,redirect,get_object_or_404
+from django.urls import reverse
 from django.views.decorators.cache import cache_control
+
 from django.contrib.auth import authenticate,login,logout
 from django.contrib.auth.decorators import user_passes_test, login_required
 from products.models import *
@@ -61,7 +63,10 @@ def admin_home(request):
     # Get the total order count and total price for all orders
     order_count = Order.objects.exclude(order_status='CANCELLED').count()
     total_price = Order.objects.exclude(order_status='CANCELLED').aggregate(total=Sum('total_price'))['total']
+    total_customers = User.objects.filter(is_superuser=False, is_staff=False).count()
     categories = Category.objects.all()
+
+
     data = []
 
     for category in categories:
@@ -144,11 +149,13 @@ def admin_home(request):
             'total_price': total_price,
             'order_count_today': order_count_today,
             'total_price_today': total_price_today,
+            'total_customers': total_customers,
         }
         return render(request, 'admin/admin_home.html', context)
 
 
     return render(request, 'admin/admin_home.html', context)
+
 
 def admin_logout(request):
     logout(request)
@@ -211,7 +218,7 @@ def addproduct(request):
 @login_required(login_url='admin_signin')  # This ensures that the user is logged in before accessing the view.
 @user_passes_test(is_superuser, login_url='admin_signin') 
 def userlist(request):
-
+    print("DEBUG: CUSTOMERS PAGE VIEW REACHED")
     userlist = User.objects.all()
 
     return render(request,'admin/userlist.html',{'userlist':userlist})
@@ -412,24 +419,13 @@ def delete_image(request,image_id):
 
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
-def admin_logout(request):
-    if request.user.is_authenticated:
-        logout(request)
-  
-    # messages.success(request,"logged Out Successfully")
-    return redirect('home')
-    # logout(request)
-    # signin_url = reverse('admin_signin')  # Replace 'admin_signin' with the actual name of your URL pattern for the admin sign-in page
-    # return redirect(signin_url)
-
 def delete_variant(request, variant_id):
     variant = get_object_or_404(Variant, id=variant_id)
-    
     variant.delete()
-
     return redirect('product_view')
 
 def add_custom_color(request):
+
     if request.method == 'POST':
         new_color = request.POST.get('customColor')
         if new_color:

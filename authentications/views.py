@@ -365,6 +365,7 @@ def api_signup(request):
     email = data.get('email')
     password = data.get('password')
     confirm_password = data.get('confirm_password')
+    referral_code = data.get('referral_code')
     
     if password != confirm_password:
         return Response({'error': 'Passwords do not match'}, status=400)
@@ -378,6 +379,38 @@ def api_signup(request):
     myuser = User.objects.create_user(username=username, email=email, password=password)
     myuser.is_active = False
     myuser.save()
+
+    if referral_code:
+        try:
+            referred_user = Referral.objects.get(referral_code=referral_code)
+            referred_by_user = referred_user.user
+
+            # Credit the user's wallet with 50 RS
+            user_wallet, _ = wallet.objects.get_or_create(user=myuser)
+            user_wallet.Wallettotal += 50
+            user_wallet.save()
+
+            # Credit the referred person's wallet with 100 RS
+            referred_user_wallet, _ = wallet.objects.get_or_create(user=referred_by_user)
+            referred_user_wallet.Wallettotal += 100
+            referred_user_wallet.save()
+
+            # Update the referral record
+            try:
+                refferal_codes = Referral.objects.get(user=myuser)
+                refferal_codes.referred_by = referred_by_user
+                refferal_codes.save()
+            except Referral.DoesNotExist:
+                Referral.objects.create(user=myuser, referred_by=referred_by_user)
+
+        except Referral.DoesNotExist:
+            # We don't necessarily want to block signup if referral code is wrong, 
+            # but the original code redirected to signup with error.
+            # In API we can return an error or just proceed. Original code blocked it.
+            # I'll keep it consistent and block it.
+            myuser.delete()
+            return Response({'error': 'Invalid referral code'}, status=400)
+
     
     current_site = get_current_site(request)
     esubject = "Confirm your email @ Kido Couture"

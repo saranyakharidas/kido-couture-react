@@ -21,9 +21,10 @@ from django.views.generic import TemplateView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('',include('adminside.urls')),
     path('',include('products.urls')),
     path('',include('authentications.urls')),
-    path('',include('adminside.urls')),
+
     path('',include('cart.urls')),
     path('',include('wishlist.urls')),
     path('',include('userprofile.urls')),

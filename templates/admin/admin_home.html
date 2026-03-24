@@ -92,6 +92,23 @@ admin home
                 </div>
             </div>
         </div>
+        <div class="col-md-6 col-xl-3">
+            <a href="{% url 'userlist' %}" style="text-decoration: none; color: inherit;">
+                <div class="card widget-card-1">
+                    <div class="card-block-small">
+                        <span class="text-c-yellow f-w-600">Total Customers</span>
+                        <h4>{{ total_customers }}</h4>
+                        <div>
+                            <span class="f-left m-t-10 text-muted">
+                                <i class="text-c-yellow f-16 icofont icofont-users m-r-10"></i>Total Registered
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+
   
         <!-- Statestics Start -->
         <div class="col-md-12 col-xl-8">

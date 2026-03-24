@@ -84,3 +84,9 @@ npm run dev
 
 ## 📄 License
 Internal use only for Kido Couture.
+
+## 📸 Preview
+
+![Home](./frontend/screenshots/home.png)
+![Products](./frontend/screenshots/products.png)
+![Cart](./frontend/screenshots/cart.png)

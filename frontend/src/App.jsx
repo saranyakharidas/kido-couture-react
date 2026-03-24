@@ -31,7 +31,7 @@ const getImageUrl = (url) => {
   return `${baseUrl.endsWith('/') ? baseUrl.slice(0, -1) : baseUrl}/media/${url}`;
 }
 
-function App() {
+function App({ initialView = 'shop', initialAuthType = 'login' }) {
   const [products, setProducts] = useState([])
   const [categories, setCategories] = useState([])
   const [loading, setLoading] = useState(true)
@@ -43,8 +43,9 @@ function App() {
   const [search, setSearch] = useState('')
   const [sort, setSort] = useState('default')
   const [price, setPrice] = useState('all')
-  const [view, setView] = useState('shop') // 'shop', 'wishlist', 'product-details', 'cart'
-  const [authType, setAuthType] = useState('login')
+  const [view, setView] = useState(initialView || 'shop') // 'shop', 'wishlist', 'product-details', 'cart'
+  const [authType, setAuthType] = useState(initialAuthType || 'login')
+
   const [currentProductSlug, setCurrentProductSlug] = useState(null)
   const [popup, setPopup] = useState({
     isOpen: false,

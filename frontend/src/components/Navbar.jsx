@@ -149,21 +149,24 @@ const Navbar = ({ onViewChange, currentView }) => {
 
                             {/* Dropdown Menu */}
                             <div className="user-dropdown-menu" style={{
-                                position: 'absolute', top: '100%', right: 0, marginTop: '10px',
+                                position: 'absolute', top: '100%', right: 0, 
                                 background: 'white', borderRadius: '12px', boxShadow: '0 10px 40px rgba(0,0,0,0.1)',
                                 border: '1px solid #eee', minWidth: '180px', overflow: 'hidden',
-                                display: 'none', zIndex: 1001
+                                display: 'none', zIndex: 1001,
+                                paddingTop: '5px' // Add a small internal gap instead of external margin
                             }}>
+
                                 <div style={{ padding: '15px', borderBottom: '1px solid #f5f5f5' }}>
                                     <p style={{ margin: 0, fontSize: '0.8rem', color: '#888' }}>Logged in as</p>
                                     <p style={{ margin: 0, fontWeight: 'bold', color: '#1a1a1a' }}>{user.username}</p>
                                 </div>
                                 
                                 {user.is_superuser && (
-                                    <a href="/admin_home" style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '12px 15px', color: '#1a1a1a', textDecoration: 'none', fontSize: '0.9rem', transition: 'background 0.2s' }} className="dropdown-item-hover">
+                                    <a href={`${API_BASE_URL}/admin_home`} style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '12px 15px', color: '#1a1a1a', textDecoration: 'none', fontSize: '0.9rem', transition: 'background 0.2s' }} className="dropdown-item-hover">
                                         <Search size={16} /> Admin Dashboard
                                     </a>
                                 )}
+
                                 
                                 <div onClick={() => onViewChange('profile')} style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '12px 15px', color: '#1a1a1a', textDecoration: 'none', fontSize: '0.9rem', cursor: 'pointer', transition: 'background 0.2s' }} className="dropdown-item-hover">
                                     <User size={16} /> My Profile
