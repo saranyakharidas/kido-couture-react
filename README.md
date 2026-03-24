@@ -1,5 +1,7 @@
 # 👗 Kido Couture - Premium E-commerce Platform
 
+🌐 Live Demo: https://kido-couture-react.vercel.app
+
 Kido Couture is a high-performance, full-stack e-commerce application designed for a premium clothing experience. It features a robust **Django** backend and a dynamic, high-speed **React (Vite)** frontend.
 
 ---
