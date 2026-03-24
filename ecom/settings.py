@@ -171,15 +171,15 @@ STATICFILES_DIRS = [
 ]
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
-DJANGO_VITE = {
-    "default": {
-        "dev_mode": DEBUG,
-        "dev_server_host": "127.0.0.1",
-        "dev_server_port": 5173,
-        "static_url_prefix": "",
-        "manifest_path": os.path.join(BASE_DIR, "static", "dist", ".vite", "manifest.json"),
-    }
-}
+# DJANGO_VITE = {
+#     "default": {
+#         "dev_mode": DEBUG,
+#         "dev_server_host": "127.0.0.1",
+#         "dev_server_port": 5173,
+#         "static_url_prefix": "",
+#         "manifest_path": os.path.join(BASE_DIR, "static", "dist", ".vite", "manifest.json"),
+#     }
+# }
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
