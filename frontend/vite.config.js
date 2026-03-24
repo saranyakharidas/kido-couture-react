@@ -9,9 +9,10 @@ export default defineConfig({
     outDir: 'dist',
     rollupOptions: {
       input: {
-        main: './src/main.jsx',
+        main: './index.html',
       },
     },
+
   },
   server: {
     port: 5173,

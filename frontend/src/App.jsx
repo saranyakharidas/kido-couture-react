@@ -13,10 +13,22 @@ import AuthForms from './components/AuthForms'
 import Popup from './components/Popup'
 import './index.css'
 
-// Force relative path in development to ensure everything goes through the Vite proxy (handles CORS and IPv4/IPv6 mismatches)
+// Prefer VITE_API_URL environment variable, or empty for relative proxying in dev
 const getApiBaseUrl = () => {
-  return '';
+    const envUrl = import.meta.env.VITE_API_URL;
+    if (!envUrl) return '';
+    try {
+        const url = new URL(envUrl);
+        if ((url.hostname === 'localhost' || url.hostname === '127.0.0.1') &&
+            window.location.hostname !== url.hostname) {
+            return '';
+        }
+        return envUrl;
+    } catch (e) {
+        return envUrl;
+    }
 };
+
 
 const API_BASE_URL = getApiBaseUrl();
 
