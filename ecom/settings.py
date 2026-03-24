@@ -32,11 +32,7 @@ EMAIL_PORT = 587
 SECRET_KEY = os.getenv('SECRET_KEY', 'default-django-secret-key-if-not-set')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.getenv('DEBUG', 'False').lower() == 'true'
-
-
-
-ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
+DEBUG = True
 
 INTERNAL_IPS = [
     '127.0.0.1',
@@ -90,10 +86,8 @@ CSRF_TRUSTED_ORIGINS = [
 ROOT_URLCONF = 'ecom.urls'
 
 CORS_ALLOWED_ORIGINS = [
+    "https://kido-couture-react.vercel.app",
     "http://localhost:5173",
-    "http://127.0.0.1:5173",
-    "http://localhost:8000",
-    "http://127.0.0.1:8000",
 ]
 
 CORS_ALLOW_CREDENTIALS = True
@@ -124,7 +118,7 @@ WSGI_APPLICATION = 'ecom.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'database'),
+        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
 }
 
