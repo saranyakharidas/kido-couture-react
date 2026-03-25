@@ -1,5 +1,4 @@
 {% load static %}
-<!-- {% load django_vite %} -->
 <!DOCTYPE html>
 <html lang="en">
 
@@ -46,19 +45,6 @@
 		integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz"
 		crossorigin="anonymous"></script>
 
-	{% if debug %}
-	<script type="module">
-		import { injectIntoGlobalHook } from "http://127.0.0.1:5173/@react-refresh";
-		injectIntoGlobalHook(window);
-		window.$RefreshReg$ = () => { };
-		window.$RefreshSig$ = () => (type) => type;
-		window.__vite_plugin_react_preamble_installed__ = true;
-	</script>
-	<script type="module" crossorigin src="http://127.0.0.1:5173/@vite/client"></script>
-	<script type="module" crossorigin src="http://127.0.0.1:5173/src/main.jsx"></script>
-	{% else %}
-	<!-- {% vite_asset 'src/main.jsx' %} -->
-	{% endif %}
 	<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
 </head>
