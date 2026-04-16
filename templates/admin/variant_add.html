@@ -85,8 +85,9 @@ variant a
             <label class="col-sm-2 col-form-label">Variant Size</label>
             <div class="col-sm-10">
                 <select id="sizes" name="sizes" required class="form-control">
+                  <option value="">Select Size</option>
                   {% for size in sizes %}
-                    <option value="{{ size.size }}">{{ size.size }}</option>
+                    <option value="{{ size.id }}">{{ size.size }}</option>
                 {% endfor %}
                 </select>
             </div>
@@ -123,9 +124,11 @@ variant a
       <label class="col-sm-2 col-form-label">Color</label>
       <div class="col-sm-10">
           <select id="colors" name="colors" required class="form-control">
+              <option value="">Select Color</option>
               {% for color in colors %}
-                  <option value="{{ color.color }}">{{ color.color }}</option>
+                  <option value="{{ color.id }}">{{ color.color }}</option>
               {% endfor %}
+              <option value="other">Other</option>
           </select>
           <a href="{% url 'add_custom_color' %}">Go to Custom Color Page</a>
 

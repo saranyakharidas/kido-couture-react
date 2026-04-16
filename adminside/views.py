@@ -25,6 +25,35 @@ import razorpay
 def is_superuser(user):
     return user.is_superuser
 
+DEFAULT_VARIANT_SIZES = [
+    '0-1 Years',
+    '1-2 Years',
+    '2-3 Years',
+    '4-5 Years',
+    '6-7 Years',
+    '8-9 Years',
+    '10-12 Years',
+]
+
+DEFAULT_VARIANT_COLORS = [
+    'Pink',
+    'Lavender',
+    'Blue',
+    'Dark Blue',
+    'Maroon',
+    'White',
+    'Peach',
+    'Cream',
+]
+
+
+def ensure_variant_options():
+    for size_name in DEFAULT_VARIANT_SIZES:
+        size.objects.get_or_create(size=size_name)
+
+    for color_name in DEFAULT_VARIANT_COLORS:
+        color.objects.get_or_create(color=color_name)
+
 @cache_control(no_cache=True,must_revalidate=True,no_store=True)
 def admin_signin(request):
    if request.user.is_authenticated and request.user.is_superuser:
@@ -309,14 +338,13 @@ def variant_edit(request, variant_id):
         variant_titles = request.POST.get('variant_title')
         colors = request.POST.get('colors')
         sizess = request.POST.get('sizes')
-        quantity = request.POST.get('quantity')
         price = request.POST.get('price')
         discount_price = request.POST.get('discount_price')
         stock = request.POST.get('stock')
         display_image = request.FILES.get('display_image')
         images = request.FILES.getlist('images')
-        colorss =color.objects.get(id = colors)
-        sizes =size.objects.get(size = sizess)
+        colorss = get_object_or_404(color, id=colors)
+        sizes = get_object_or_404(size, id=sizess)
         if discount_price:
             pass
         else:
@@ -325,7 +353,6 @@ def variant_edit(request, variant_id):
         variant.title = variant_titles
         variant.color = colorss
         variant.size = sizes
-        variant.quantity = quantity
         variant.price = price
         variant.discount_price = discount_price
         variant.stock = stock
@@ -340,6 +367,7 @@ def variant_edit(request, variant_id):
             product_image.objects.create(product=variant, image=image)
 
         return redirect('product_view', product_id=variant.product.id)  # Redirect to the product view page after successful update
+    ensure_variant_options()
     colors = color.objects.all()
     sizes = size.objects.all()
 
@@ -360,7 +388,6 @@ def variant_add(request,product_id):
     
         colors = request.POST.get('colors')
         sizes = request.POST.get('sizes')
-        quantity = request.POST.get('quantity')
         price = request.POST.get('price')
         discount_price = request.POST.get('discount_price')
         stock = request.POST.get('stock')
@@ -374,19 +401,18 @@ def variant_add(request,product_id):
             discount_price = None
         product = Products.objects.get(id=product_id)
 
-        try:
-            color_obj = color.objects.get(color=colors)
-        except color.DoesNotExist:
+        if colors == 'other' and color_name:
             # Create a new color if it doesn't exist
-            color_obj = color.objects.create(color=color_name)
+            color_obj, _ = color.objects.get_or_create(color=color_name)
+        else:
+            color_obj = get_object_or_404(color, id=colors)
 
-        size_slt =size.objects.get(size=sizes)
+        size_slt = get_object_or_404(size, id=sizes)
         variant = Variant.objects.create(
             title=variant_titles,
             product=product,
             color=color_obj,
             size=size_slt,
-            quantity=quantity,
             price=price,
             discount_price = discount_price,
             stock=stock,
@@ -400,6 +426,7 @@ def variant_add(request,product_id):
         return redirect('product_view',product_id=product_id)  # Redirect to the admin page after successful submission
 
     # Retrieve products, colors, and sizes for the form
+    ensure_variant_options()
     products = Products.objects.all()
     colors = color.objects.all()
     sizes = size.objects.all()
@@ -429,11 +456,7 @@ def add_custom_color(request):
     if request.method == 'POST':
         new_color = request.POST.get('customColor')
         if new_color:
-            colr = color.objects.create(color=new_color)
-            variant = Variant.objects.create(
-                color=colr,
-                price=0.0,
-            )
+            color.objects.get_or_create(color=new_color)
     colors = color.objects.all()
     context = {
         'colors': colors # Use 'colors' as the key in the context dictionary

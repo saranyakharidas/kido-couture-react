@@ -59,7 +59,7 @@ variant edit
             <div class="col-sm-10">
               <select id="sizes" name="sizes" required class="form-control">
                 {% for size in sizes %}
-                  <option value="{{ size.size }}">{{ size.size }}</option>
+                  <option value="{{ size.id }}" {% if variant.size.id == size.id %}selected{% endif %}>{{ size.size }}</option>
               {% endfor %}
               </select>
             </div>
@@ -70,7 +70,7 @@ variant edit
           <div class="col-sm-10">
             <select id="colors" name="colors" required class="form-control">
               {% for color in colors %}
-                <option value="{{ color.id }}">{{ color.color }}</option>
+                <option value="{{ color.id }}" {% if variant.color.id == color.id %}selected{% endif %}>{{ color.color }}</option>
               {% endfor %}
             </select>
             
