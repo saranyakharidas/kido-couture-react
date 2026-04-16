@@ -188,8 +188,7 @@ def admin_home(request):
 
 def admin_logout(request):
     logout(request)
-      # Replace 'admin_signin' with the actual name of your URL pattern for the admin sign-in page
-    return redirect(reverse('home'))
+    return redirect('admin_signin')
 
 @login_required(login_url='admin_signin')  # This ensures that the user is logged in before accessing the view.
 @user_passes_test(is_superuser, login_url='admin_signin') 

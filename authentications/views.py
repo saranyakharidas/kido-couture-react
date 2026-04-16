@@ -43,10 +43,14 @@ def is_valid_password(password):
     return True
 
 def home(request):
+    if request.user.is_authenticated and request.user.is_superuser:
+        return redirect('admin_home')
     return redirect('shop', 0)
 
 def signin(request):
    if request.user.is_authenticated:
+       if request.user.is_superuser:
+          return redirect('admin_home')
        return redirect('home')
    
    if request.method == 'POST':
