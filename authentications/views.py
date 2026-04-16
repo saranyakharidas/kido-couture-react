@@ -59,7 +59,7 @@ def signin(request):
          # Bypass OTP for admin/superusers
          if user.is_superuser:
             login(request, user)
-            return redirect('home')
+            return redirect('admin_home')
 
          otp_store = get_random_string(length=5, allowed_chars='0123456789')
          request.session['otp'] = otp_store

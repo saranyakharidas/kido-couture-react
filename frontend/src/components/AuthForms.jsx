@@ -55,6 +55,8 @@ const AuthForms = ({ API_BASE_URL, onViewChange, onLoginSuccess, initialView = '
             if (response.ok && data.success) {
                 if (data.requires_otp) {
                     setView('otp');
+                } else if (data.is_superuser) {
+                    window.location.href = `${API_BASE_URL}/admin_home`;
                 } else {
                     onLoginSuccess();
                 }
