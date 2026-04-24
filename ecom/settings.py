@@ -12,9 +12,24 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 
 import os
 from dotenv import load_dotenv
+import dj_database_url
 
 # Load .env file
 load_dotenv()
+
+
+def get_list_env(name, default=None):
+    value = os.getenv(name, "")
+    if value:
+        return [item.strip() for item in value.split(",") if item.strip()]
+    return default or []
+
+
+def get_bool_env(name, default=False):
+    value = os.getenv(name)
+    if value is None:
+        return default
+    return value.strip().lower() in {"1", "true", "yes", "on"}
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -32,7 +47,7 @@ EMAIL_PORT = 587
 SECRET_KEY = os.getenv('SECRET_KEY', 'default-django-secret-key-if-not-set')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = get_bool_env("DEBUG", False)
 
 INTERNAL_IPS = [
     '127.0.0.1',
@@ -79,18 +94,31 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-CSRF_TRUSTED_ORIGINS = [
-    "https://*.onrender.com"
-]
+CSRF_TRUSTED_ORIGINS = get_list_env(
+    "CSRF_TRUSTED_ORIGINS",
+    [
+        "https://*.onrender.com",
+        "https://kido-couture-react.vercel.app",
+    ],
+)
 
 ROOT_URLCONF = 'ecom.urls'
 
-CORS_ALLOWED_ORIGINS = [
-    "https://kido-couture-react.vercel.app",
-    "http://localhost:5173",
-]
+CORS_ALLOWED_ORIGINS = get_list_env(
+    "CORS_ALLOWED_ORIGINS",
+    [
+        "https://kido-couture-react.vercel.app",
+        "http://localhost:5173",
+    ],
+)
 
 CORS_ALLOW_CREDENTIALS = True
+
+# Cross-domain session and CSRF cookie settings
+SESSION_COOKIE_SAMESITE = 'None'
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SAMESITE = 'None'
+CSRF_COOKIE_SECURE = True
 
 
 TEMPLATES = [
@@ -116,10 +144,11 @@ WSGI_APPLICATION = 'ecom.wsgi.application'
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-    }
+    'default': dj_database_url.config(
+        default=f"sqlite:///{os.path.join(BASE_DIR, 'db.sqlite3')}",
+        conn_max_age=600,
+        conn_health_checks=True,
+    )
 }
 
 
@@ -184,4 +213,14 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = get_list_env(
+    "ALLOWED_HOSTS",
+    [
+        "localhost",
+        "127.0.0.1",
+    ],
+)
+
+RENDER_EXTERNAL_HOSTNAME = os.getenv("RENDER_EXTERNAL_HOSTNAME")
+if RENDER_EXTERNAL_HOSTNAME and RENDER_EXTERNAL_HOSTNAME not in ALLOWED_HOSTS:
+    ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
