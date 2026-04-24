@@ -22,6 +22,9 @@ from banners.models import Banner
 from userorder.models import *
 from django.db.models import Count
 from cart.models import *
+import logging
+
+logger = logging.getLogger(__name__)
 
 def is_valid_password(password):
    
@@ -323,22 +326,35 @@ def api_login(request):
         if user.is_superuser:
             login(request, user)
             return Response({'success': True, 'is_superuser': True})
-            
-        otp_store = get_random_string(length=5, allowed_chars='0123456789')
-        request.session['otp'] = otp_store
-        request.session['user_pk'] = user.pk
-        
-        esubject = "OTP Login"
-        emessage = render_to_string('verify/otp_mail.html', {
-            'name': user.username,
-            'otp': otp_store,
-        })
-        email = EmailMessage(
-            esubject, emessage, settings.EMAIL_HOST_USER, [user.email]
-        )
-        email.fail_silently = True
-        email.send()
-        
+
+        if not user.email:
+            return Response(
+                {'error': 'This account does not have an email address, so OTP login cannot be completed.'},
+                status=400
+            )
+
+        try:
+            otp_store = get_random_string(length=5, allowed_chars='0123456789')
+            request.session['otp'] = otp_store
+            request.session['user_pk'] = user.pk
+
+            esubject = "OTP Login"
+            emessage = render_to_string('verify/otp_mail.html', {
+                'name': user.username,
+                'otp': otp_store,
+            })
+            email = EmailMessage(
+                esubject, emessage, settings.EMAIL_HOST_USER, [user.email]
+            )
+            email.fail_silently = False
+            email.send()
+        except Exception:
+            logger.exception("OTP email failed for user '%s'", user.username)
+            return Response(
+                {'error': 'Unable to send OTP email right now. Please verify the email settings and try again.'},
+                status=500
+            )
+
         return Response({'success': True, 'requires_otp': True})
     return Response({'error': 'Invalid username or password'}, status=400)
 
@@ -380,9 +396,13 @@ def api_signup(request):
     if not is_valid_password(password):
         return Response({'error': 'Password must be at least 8 characters long and contain one uppercase letter, one lowercase letter, and one digit.'}, status=400)
         
-    myuser = User.objects.create_user(username=username, email=email, password=password)
-    myuser.is_active = False
-    myuser.save()
+    try:
+        myuser = User.objects.create_user(username=username, email=email, password=password)
+        myuser.is_active = False
+        myuser.save()
+    except Exception:
+        logger.exception("User creation failed for username '%s'", username)
+        return Response({'error': 'Unable to create account right now.'}, status=500)
 
     if referral_code:
         try:
@@ -416,18 +436,26 @@ def api_signup(request):
             return Response({'error': 'Invalid referral code'}, status=400)
 
     
-    current_site = get_current_site(request)
-    esubject = "Confirm your email @ Kido Couture"
-    emessage = render_to_string('verify/email_confirm.html', {
-        'name': myuser.username,
-        'domain': current_site.domain,
-        'uid': urlsafe_base64_encode(force_bytes(myuser.pk)),
-        'token': generate_token.make_token(myuser),
-    })
-    
-    email_msg = EmailMessage(esubject, emessage, settings.EMAIL_HOST_USER, [myuser.email])
-    email_msg.fail_silently = True
-    email_msg.send()
+    try:
+        current_site = get_current_site(request)
+        esubject = "Confirm your email @ Kido Couture"
+        emessage = render_to_string('verify/email_confirm.html', {
+            'name': myuser.username,
+            'domain': current_site.domain,
+            'uid': urlsafe_base64_encode(force_bytes(myuser.pk)),
+            'token': generate_token.make_token(myuser),
+        })
+
+        email_msg = EmailMessage(esubject, emessage, settings.EMAIL_HOST_USER, [myuser.email])
+        email_msg.fail_silently = False
+        email_msg.send()
+    except Exception:
+        logger.exception("Signup email failed for username '%s'", username)
+        myuser.delete()
+        return Response(
+            {'error': 'Account email could not be sent. Please verify the email settings and try again.'},
+            status=500
+        )
     
     return Response({'success': True, 'message': 'Registration successful. Please check your email to verify your account.'})
 
