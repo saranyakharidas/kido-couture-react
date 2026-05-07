@@ -169,7 +169,6 @@ function App({ initialView = 'shop', initialAuthType = 'login' }) {
 
       const data = await response.json();
       if (data.success) {
-        // Trigger navbar refresh
         window.dispatchEvent(new Event('user-login-success'));
         setShowModal(false);
         triggerPopup(
@@ -181,7 +180,15 @@ function App({ initialView = 'shop', initialAuthType = 'login' }) {
         return true;
       } else {
         if (response.status === 403) {
-          window.location.href = '/signin';
+          // Close modal first so popup isn't hidden behind it
+          setShowModal(false);
+          // Not logged in — navigate within React to sign-in
+          triggerPopup(
+            'Please sign in to add items to your cart.',
+            'error',
+            () => { setAuthType('login'); setView('auth'); },
+            true
+          );
         } else {
           triggerPopup(data.error || 'Failed to add to cart', 'error');
         }

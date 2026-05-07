@@ -155,15 +155,48 @@ def shop(request, category_id):
 @api_view(['GET'])
 def shop_api(request, category_id):
     """
-    Simplified API for debugging.
+    Enhanced API supporting search, sort, and price filters for the React frontend.
     """
     if category_id == 0:
         variants = Variant.objects.all()
     else:
         variants = Variant.objects.filter(product__category_id=category_id)
     
-    # Simple sort by ID to be extremely safe
-    variants = variants.order_by('-id')
+    # Get parameters from request
+    search_query = request.GET.get('search')
+    price_filter = request.GET.get('price')
+    sort_by = request.GET.get('sort')
+
+    # Apply Search
+    if search_query:
+        variants = variants.filter(
+            Q(product__name__icontains=search_query) | 
+            Q(product__descriptions__icontains=search_query) |
+            Q(title__icontains=search_query)
+        )
+
+    # Apply Price Filter
+    if price_filter and price_filter != 'all':
+        if price_filter == '0-500':
+            variants = variants.filter(price__range=(0, 500))
+        elif price_filter == '500-1000':
+            variants = variants.filter(price__range=(500, 1000))
+        elif price_filter == '1000-2000':
+            variants = variants.filter(price__range=(1000, 2000))
+        elif price_filter == '2000-3000':
+            variants = variants.filter(price__range=(2000, 3000))
+        elif price_filter == '3000+':
+            variants = variants.filter(price__gte=3000)
+
+    # Apply Sorting
+    if sort_by == 'newness':
+        variants = variants.order_by('-product__created_at')
+    elif sort_by == 'price_low_to_high':
+        variants = variants.order_by('price')
+    elif sort_by == 'price_high_to_low':
+        variants = variants.order_by('-price')
+    else:
+        variants = variants.order_by('-id')
     
     serializer = VariantSerializer(variants, many=True)
     return Response(serializer.data)
@@ -182,10 +215,20 @@ def categories_api(request):
 def product_details_api(request, slug):
     try:
         variant = Variant.objects.get(slug=slug)
-        # Related products (variants from same category excluding current product)
-        related_products = Variant.objects.filter(
+        related_products_qs = Variant.objects.filter(
             product__category=variant.product.category
-        ).exclude(product=variant.product).distinct('product')[:4]
+        ).exclude(product=variant.product)[:10]
+        
+        # Manual distinct by product for SQLite compatibility
+        seen_products = set()
+        unique_variants = []
+        for v in related_products_qs:
+            if v.product_id not in seen_products:
+                unique_variants.append(v)
+                seen_products.add(v.product_id)
+            if len(unique_variants) >= 4:
+                break
+        related_products = unique_variants
         
         variant_data = VariantSerializer(variant).data
         related_data = VariantSerializer(related_products, many=True).data

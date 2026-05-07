@@ -1,94 +1,73 @@
-# 👗 Kido Couture - Premium E-commerce Platform
+# Kido Couture - Premium E-Commerce Platform
 
-🌐 Live Demo: https://kido-couture-react.vercel.app
+A full-stack, high-performance e-commerce application built with **React 19**, **Django Rest Framework**, and **Framer Motion**. This project demonstrates professional-grade web development practices, including RESTful API design, state-driven UI, and robust authentication.
 
-Kido Couture is a high-performance, full-stack e-commerce application designed for a premium clothing experience. It features a robust **Django** backend and a dynamic, high-speed **React (Vite)** frontend.
+## 🚀 Key Features
 
----
+### 🛍️ Dynamic Shopping Experience
+- **Advanced Filtering:** Real-time search, category filtering, and sorting (price, newness) powered by a custom Django API.
+- **Product Variants:** Support for multiple sizes, colors, and images per product.
+- **Interactive UI:** Smooth transitions and micro-animations using Framer Motion for a premium feel.
 
-## 🚀 Features
+### 🔐 Secure Authentication
+- **Two-Factor OTP Login:** Enhanced security for user accounts using email-based One-Time Passwords.
+- **Email Verification:** Account activation via unique signed tokens.
+- **Password Recovery:** Secure password reset workflow.
 
-- **⚡ Modern Frontend**: Built with React 19 + Vite for sub-second page loads and smooth transitions.
-- **🛡️ Secure Auth**: Session-based authentication with Django, including CSRF protection.
-- **🛒 Dynamic Shopping**: Add to cart, wishlist functionality, and real-time cart updates.
-- **💳 Payment Integration**: Fully integrated with **Razorpay** for secure online payments.
-- **📦 Order Management**: Complete checkout flow, order tracking, and invoice generation.
-- **🎨 Premium UI**: Featuring Framer Motion animations, Lucide icons, and a glassmorphism design.
+### 🛠️ Admin Powerhouse
+- **Comprehensive Dashboard:** Real-time statistics on sales, orders, and customer activity.
+- **Management Suite:** Full CRUD operations for products, categories, coupons, and banners.
+- **Sales Analytics:** Detailed reporting tools for tracking business growth.
 
----
+### 💳 Modern Checkout & Payments
+- **Razorpay Integration:** Seamless and secure payment gateway integration.
+- **Wallet & Referral System:** Built-in rewards program for user engagement.
+- **Coupon Management:** Flexible discount system with usage tracking.
 
-## 🛠️ Tech Stack
+## 🛠️ Technical Stack
 
-**Frontend:**
-- React.js (Vite)
-- Framer Motion (Animations)
-- Lucide React (Icons)
-- Vanilla CSS (Custom Premium Styles)
+- **Frontend:** React 19, Vite, Framer Motion, Lucide Icons, Vanilla CSS
+- **Backend:** Django 5.x, Django Rest Framework (DRF)
+- **Database:** SQLite (Development) / PostgreSQL (Production ready)
+- **Authentication:** Session-based with CSRF protection & OTP
+- **Payments:** Razorpay SDK
 
-**Backend:**
-- Python 3.x
-- Django (Web Framework)
-- Django Rest Framework (API)
-- SQLite/PostgreSQL (Database)
-- Razorpay SDK (Payments)
+## 📦 Installation & Setup
 
----
+1. **Clone the repository:**
+   ```bash
+   git clone <repo-url>
+   cd kido-couture-react
+   ```
 
-## ⚙️ Installation & Setup
+2. **Backend Setup:**
+   ```bash
+   cd backend
+   python -m venv venv
+   source venv/bin/activate  # venv\Scripts\activate on Windows
+   pip install -r requirements.txt
+   python manage.py migrate
+   python manage.py runserver
+   ```
 
-### 1. Clone the repository
-```bash
-git clone https://github.com/saranyakharidas/kido-couture-react.git
-cd kido-couture-react
-```
+3. **Frontend Setup:**
+   ```bash
+   cd frontend
+   npm install
+   npm run dev
+   ```
 
-### 2. Backend Setup (Django)
-```bash
-# Create a virtual environment
-python -m venv venv
-# On Windows:
-venv\Scripts\activate
-# On macOS/Linux:
-# source venv/bin/activate
+## 📝 Configuration
 
-# Install dependencies
-pip install -r requirement.txt
-
-# Run migrations
-python manage.py migrate
-
-# Start the server
-python manage.py runserver
-```
-
-### 3. Frontend Setup (React)
-```bash
-cd frontend
-
-# Install packages
-npm install
-
-# Start development server
-npm run dev
+Create a `.env` file in the root directory with the following:
+```env
+SECRET_KEY=your_django_secret_key
+DEBUG=True
+EMAIL_HOST_USER=your_email@gmail.com
+EMAIL_HOST_PASSWORD=your_app_password
+RAZOR_KEY_ID=your_razorpay_key
+RAZOR_KEY_SECRET=your_razorpay_secret
 ```
 
 ---
-
-## 📁 Project Structure
-
-- `/authentications`: User login, signup, and profile logic.
-- `/products`: Product catalog, categories, and inventory management.
-- `/cart`: Shopping cart and wishlist logic.
-- `/userorder`: Checkout, payment processing, and order history.
-- `/frontend`: Modern React source code, components, and assets.
-
----
-
-## 📄 License
-Internal use only for Kido Couture.
-
-## 📸 Preview
-
-![Home](./frontend/screenshots/home.png)
-![Products](./frontend/screenshots/products.png)
-![Cart](./frontend/screenshots/cart.png)
+*Built with ❤️ for a professional portfolio.*

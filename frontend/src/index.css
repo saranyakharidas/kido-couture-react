@@ -579,3 +579,129 @@ body {
 .bg-red {
   background: #ff4d4f;
 }
+
+/* Premium UI Utilities */
+.flex { display: flex; }
+.flex-col { flex-direction: column; }
+.flex-col-reverse { flex-direction: column-reverse; }
+.items-center { align-items: center; }
+.items-end { align-items: flex-end; }
+.justify-center { justify-content: center; }
+.justify-between { justify-content: space-between; }
+.flex-1 { flex: 1 1 0%; }
+.flex-wrap { flex-wrap: wrap; }
+.flex-row { flex-direction: row; }
+
+.gap-1 { gap: 4px; }
+.gap-2 { gap: 8px; }
+.gap-3 { gap: 12px; }
+.gap-4 { gap: 16px; }
+.gap-6 { gap: 24px; }
+.gap-8 { gap: 32px; }
+.gap-12 { gap: 48px; }
+
+.w-full { width: 100%; }
+.w-12 { width: 48px; }
+.w-14 { width: 56px; }
+.h-14 { height: 56px; }
+.h-10 { height: 40px; }
+.h-16 { height: 64px; }
+.h-4 { height: 16px; }
+.w-px { width: 1px; }
+
+@media (min-width: 768px) {
+  .md\:flex-row { flex-direction: row !important; }
+  .md\:w-1\/2 { width: 50% !important; }
+}
+
+.text-xs { font-size: 0.75rem; }
+.text-sm { font-size: 0.875rem; }
+.text-lg { font-size: 1.125rem; }
+.text-xl { font-size: 1.25rem; }
+.text-3xl { font-size: 1.875rem; }
+.text-4xl { font-size: 2.25rem; }
+.text-5xl { font-size: 3rem; }
+
+.font-bold { font-weight: 700; }
+.font-semibold { font-weight: 600; }
+.font-black { font-weight: 900; }
+.font-extrabold { font-weight: 800; }
+
+.tracking-widest { letter-spacing: 0.1em; }
+.uppercase { text-transform: uppercase; }
+.text-center { text-align: center; }
+
+.mb-2 { margin-bottom: 8px; }
+.mb-3 { margin-bottom: 12px; }
+.mb-4 { margin-bottom: 16px; }
+.mb-6 { margin-bottom: 24px; }
+.mb-8 { margin-bottom: 32px; }
+.mb-10 { margin-bottom: 40px; }
+.mb-12 { margin-bottom: 48px; }
+.mt-20 { margin-top: 80px; }
+.mt-32 { margin-top: 128px; }
+
+.p-3 { padding: 12px; }
+.p-6 { padding: 24px; }
+.px-2 { padding-left: 8px; padding-right: 8px; }
+.px-3 { padding-left: 12px; padding-right: 12px; }
+.py-1 { padding-top: 4px; padding-bottom: 4px; }
+.py-3 { padding-top: 12px; padding-bottom: 12px; }
+.py-4 { padding-top: 16px; padding-bottom: 16px; }
+.pb-4 { padding-bottom: 16px; }
+.pt-20 { padding-top: 80px; }
+
+.rounded-lg { border-radius: 8px; }
+.rounded-xl { border-radius: 12px; }
+.rounded-2xl { border-radius: 16px; }
+.rounded-3xl { border-radius: 24px; }
+.rounded-full { border-radius: 9999px; }
+
+.border { border: 1px solid #e5e7eb; }
+.border-b { border-bottom: 1px solid #e5e7eb; }
+.border-2 { border-width: 2px; }
+.border-gray-50 { border-color: #f9fafb; }
+.border-gray-100 { border-color: #f3f4f6; }
+.border-primary { border-color: var(--primary-color); }
+.border-white { border-color: white; }
+
+.bg-gray-50 { background-color: #f9fafb; }
+.bg-gray-100 { background-color: #f3f4f6; }
+.bg-green-100 { background-color: #dcfce7; }
+.bg-red-100 { background-color: #fee2e2; }
+.bg-red-500 { background-color: #ef4444; }
+.bg-primary { background-color: var(--primary-color); }
+
+.text-gray-400 { color: #9ca3af; }
+.text-gray-500 { color: #6b7280; }
+.text-gray-600 { color: #4b5563; }
+.text-gray-900 { color: #111827; }
+.text-green-600 { color: #16a34a; }
+.text-red-600 { color: #dc2626; }
+.text-primary { color: var(--primary-color); }
+
+.shadow-md { box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); }
+.shadow-lg { box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1); }
+.shadow-2xl { box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.25); }
+
+.object-contain { object-fit: contain; }
+.object-cover { object-fit: cover; }
+.overflow-hidden { overflow: hidden; }
+.pos-relative { position: relative; }
+.absolute { position: absolute; }
+.inset-0 { top: 0; right: 0; bottom: 0; left: 0; }
+.bottom-6 { bottom: 24px; }
+.right-6 { right: 24px; }
+
+.select-none { user-select: none; }
+.flex-c-m { display: flex; justify-content: center; align-items: center; }
+.flex-sb-m { display: flex; justify-content: space-between; align-items: center; }
+.flex-w { display: flex; flex-wrap: wrap; }
+.trans-04 { transition: all 0.4s; }
+.pointer { cursor: pointer; }
+.hover\:bg-gray-50:hover { background-color: #f9fafb; }
+.hover\:bg-white:hover { background-color: #ffffff; }
+.ring-4 { ring-width: 4px; }
+.ring-primary\/10 { --tw-ring-color: rgba(113, 127, 224, 0.1); box-shadow: 0 0 0 4px var(--tw-ring-color); }
+.hov-scale:hover { transform: scale(1.1); }
+.cursor-pointer { cursor: pointer; }

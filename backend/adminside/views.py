@@ -188,7 +188,7 @@ def admin_home(request):
 
 def admin_logout(request):
     logout(request)
-    return redirect('admin_signin')
+    return redirect('http://localhost:5173/')
 
 @login_required(login_url='admin_signin')  # This ensures that the user is logged in before accessing the view.
 @user_passes_test(is_superuser, login_url='admin_signin') 

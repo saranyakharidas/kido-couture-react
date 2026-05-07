@@ -48,7 +48,7 @@ def is_valid_password(password):
 def home(request):
     if request.user.is_authenticated and request.user.is_superuser:
         return redirect('admin_home')
-    return redirect('shop', 0)
+    return redirect('http://localhost:5173/')
 
 def signin(request):
    if request.user.is_authenticated:
@@ -83,7 +83,7 @@ def signin(request):
             [user.email],
 
          )
-         email.fail_silently = True
+         email.fail_silently = False
          email.send()
          
          return render(request,'verify/otp_login.html')
@@ -179,7 +179,7 @@ def signup(request):
          settings.EMAIL_HOST_USER,
          [myuser.email],
          )
-      email.fail_silently = True
+      email.fail_silently = False
       email.send()
       messages.success(request, "An link has been sent to your email so please go to the email and click the link give in that")
       return redirect('sendmail')
@@ -199,9 +199,7 @@ def activate(request, uidb64, token):
     if myuser is not None and generate_token.check_token(myuser, token):
       myuser.is_active = True
       myuser.save()
-      login(request, myuser)
-      
-      return redirect('home')
+      return redirect('http://localhost:5173/signin?verified=true')
     else:
       return render(request, 'verify/activation_failed.html')
    
@@ -242,7 +240,7 @@ def forget_password(request):
          [user.email],
 
       )
-      email.fail_silently = True
+      email.fail_silently = False
       email.send()
 
       messages.success(request, "An link has been sent to your email so please go to the email and click the link give in that")
@@ -285,8 +283,7 @@ def logout_user(request):
     if request.user.is_authenticated:
         logout(request)
   
-    # messages.success(request,"logged Out Successfully")
-    return redirect('signin')
+    return redirect('http://localhost:5173/')
 
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from rest_framework.response import Response
@@ -483,11 +480,10 @@ def resend_activation(request):
                 settings.EMAIL_HOST_USER,
                 [myuser.email],
             )
-            email_msg.fail_silently = True
+            email_msg.fail_silently = False
             email_msg.send()
             messages.success(request, "A new activation link has been sent to your email.")
         except User.DoesNotExist:
             messages.error(request, "No account found with this email address.")
         return render(request, 'verify/activation_failed.html')
     return render(request, 'verify/activation_failed.html')
-

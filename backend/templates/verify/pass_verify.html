@@ -1,0 +1,16 @@
+{% autoescape off %}
+Welcome to Kido Couture
+
+Hello {{ name }}
+
+Password Reset Request
+
+We received a request to reset your password. Click the link below to set a new one:
+
+Confirmation Link: //{{ domain }}{% url 'reset_password' uidb64=uid token=token %}
+
+If you did not request this, please ignore this email.
+
+Best regards,
+Kido Couture Team
+{% endautoescape %}

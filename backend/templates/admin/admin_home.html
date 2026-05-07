@@ -229,47 +229,43 @@ admin home
                           <table class="table text-nowrap mb-0 align-middle">
                             <thead class="text-dark fs-4">
                               <tr>
-                                <!-- <th class="border-bottom-0">
-                                  <h6 class="fw-semibold mb-0">Id</h6>
-                                </th> -->
                                 <th class="border-bottom-0">
-                                  <h6 class="fw-semibold mb-0">Username</h6>
+                                  <h6 class="fw-semibold mb-0">Customer</h6>
                                 </th>
                                 <th class="border-bottom-0">
-                                  <h6 class="fw-semibold mb-0"></h6>
+                                  <h6 class="fw-semibold mb-0">Status</h6>
                                 </th>
                                 <th class="border-bottom-0">
-                                  <h6 class="fw-semibold mb-0">price</h6>
+                                  <h6 class="fw-semibold mb-0">Total Amount</h6>
                                 </th>
                                 <th class="border-bottom-0">
-                                  <h6 class="fw-semibold mb-0">Payment method</h6>
+                                  <h6 class="fw-semibold mb-0">Payment</h6>
                                 </th>
                               </tr>
                             </thead>
                             <tbody>
                               {% for order in recent_orders %}
-                      <tr>
-                        <td class="border-bottom-0">
-                          <h6 class="fw-semibold mb-1">{{ order.address.first_name }}</h6>
-                          <span class="fw-normal">{{ order.address.state }}</span>                          
-                        </td>
-                        <td class="border-bottom-0">
-                          <p class="mb-0 fw-normal">{{ order.address.payment_status }}</p>
-                        </td>
-                        <td class="border-bottom-0">
-                          <div class="d-flex align-items-center gap-2">
-                            <span class="badge bg-primary rounded-3 fw-semibold">{{ order.total_price }}</span>
-                          </div>
-                        </td>
-                        <td class="border-bottom-0">
-                          <h6 class="fw-semibold mb-0 fs-4">{{ order.payment_method }}</h6>
-                        </td>
-                      </tr>
-                      {% endfor %}
-                    </tbody>
-                              
-                              
-                                           
+                              <tr>
+                                <td class="border-bottom-0">
+                                  <h6 class="fw-semibold mb-1">{{ order.address.first_name }} {{ order.address.last_name }}</h6>
+                                  <span class="fw-normal" style="font-size: 0.8rem; color: #666;">{{ order.address.city }}, {{ order.address.state }}</span>                          
+                                </td>
+                                <td class="border-bottom-0">
+                                  <span class="badge {% if order.order_status == 'DELIVERED' %}bg-success{% elif order.order_status == 'CANCELLED' %}bg-danger{% else %}bg-warning{% endif %} rounded-3 fw-semibold">
+                                    {{ order.get_order_status_display }}
+                                  </span>
+                                </td>
+                                <td class="border-bottom-0">
+                                  <div class="d-flex align-items-center gap-2">
+                                    <span class="fw-semibold">₹{{ order.total_price }}</span>
+                                  </div>
+                                </td>
+                                <td class="border-bottom-0">
+                                  <h6 class="fw-semibold mb-0 fs-4" style="font-size: 0.9rem;">{{ order.get_payment_method_display }}</h6>
+                                  <span class="fw-normal" style="font-size: 0.75rem;">{{ order.get_payment_status_display }}</span>
+                                </td>
+                              </tr>
+                              {% endfor %}
                             </tbody>
                           </table>
                         </div>
