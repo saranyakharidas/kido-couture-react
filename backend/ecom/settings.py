@@ -114,6 +114,8 @@ CORS_ALLOWED_ORIGINS = get_list_env(
 
 CORS_ALLOW_CREDENTIALS = True
 
+FRONTEND_URL = os.getenv('FRONTEND_URL', 'http://localhost:5173')
+
 # Cross-domain session and CSRF cookie settings
 SESSION_COOKIE_SAMESITE = 'None'
 SESSION_COOKIE_SECURE = True

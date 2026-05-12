@@ -48,7 +48,7 @@ def is_valid_password(password):
 def home(request):
     if request.user.is_authenticated and request.user.is_superuser:
         return redirect('admin_home')
-    return redirect('http://localhost:5173/')
+    return redirect(f"{settings.FRONTEND_URL}/")
 
 def signin(request):
    if request.user.is_authenticated:
@@ -199,7 +199,7 @@ def activate(request, uidb64, token):
     if myuser is not None and generate_token.check_token(myuser, token):
       myuser.is_active = True
       myuser.save()
-      return redirect('http://localhost:5173/signin?verified=true')
+      return redirect(f"{settings.FRONTEND_URL}/signin?verified=true")
     else:
       return render(request, 'verify/activation_failed.html')
    
@@ -283,7 +283,7 @@ def logout_user(request):
     if request.user.is_authenticated:
         logout(request)
   
-    return redirect('http://localhost:5173/')
+    return redirect(f"{settings.FRONTEND_URL}/")
 
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from rest_framework.response import Response
